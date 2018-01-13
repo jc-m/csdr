@@ -30,6 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "nmux.h"
 
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL           0
+#endif
+
 char help_text[]="nmux is a TCP stream multiplexer. It reads data from the standard input, and sends it to each client connected through TCP sockets. Available command line options are:\n"
 "\t--port (-p), --address (-a): TCP port and address to listen.\n"
 "\t--bufsize (-b), --bufcnt (-n): Internal buffer size and count.\n"

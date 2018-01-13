@@ -53,6 +53,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fastddc.h"
 #include <assert.h>
 
+#ifndef F_LINUX_SPECIFIC_BASE
+#define F_LINUX_SPECIFIC_BASE       1024
+#endif
+#ifndef F_SETPIPE_SZ
+#define F_SETPIPE_SZ    (F_LINUX_SPECIFIC_BASE + 7)
+#endif
+
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL           0
+#endif
+
 char usage[]=
 "csdr - a simple commandline tool for Software Defined Radio receiver DSP.\n\n"
 "usage: \n\n"
@@ -1793,15 +1804,15 @@ int main(int argc, char *argv[])
         //initialize FFT library, and measure time
         errhead(); fprintf(stderr,"initializing... ");
         struct timespec start_time, end_time;
-        clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
         FFT_PLAN_T* plan=make_fft_c2c(fft_size,input,output,1,benchmark);
-        clock_gettime(CLOCK_MONOTONIC_RAW, &end_time);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
         fprintf(stderr,"done in %g seconds.\n",TIME_TAKEN(start_time,end_time));
 
         //do the actual measurement about the FFT
-        clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
         for(int i=0;i<fft_cycles;i++) fft_execute(plan);
-        clock_gettime(CLOCK_MONOTONIC_RAW, &end_time);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
         float time_taken_fft = TIME_TAKEN(start_time,end_time);
         errhead(); fprintf(stderr,"%d transforms of %d processed in %g seconds, %g seconds each.\n",fft_cycles,fft_size,time_taken_fft,time_taken_fft/fft_cycles);
         return 0;
@@ -2063,11 +2074,11 @@ int main(int argc, char *argv[])
             if(!time_now_sec)
             {
                 time_now_sec=1;
-                clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
+                clock_gettime(CLOCK_MONOTONIC, &start_time);
             }
             else
             {
-                clock_gettime(CLOCK_MONOTONIC_RAW, &end_time);
+                clock_gettime(CLOCK_MONOTONIC, &end_time);
                 float timetaken;
                 if(time_now_sec<(timetaken=TIME_TAKEN(start_time,end_time)))
                 {
